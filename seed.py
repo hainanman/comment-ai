@@ -82,6 +82,8 @@ def _trace(comment: Comment, decision: str, rule_hits=None, llm_raw: str = "") -
             llm_ms=1800 if decision != "rejected" else 0,
             llm_raw=llm_raw[:2000] if llm_raw else None,
             decision=decision,
+            # 与评论时间对齐，避免历史演示数据占用"当日模型调用配额"
+            created_at=comment.created_at,
         )
     )
 

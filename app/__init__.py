@@ -26,6 +26,9 @@ def _json_error(code: str, message: str, status: int):
 
 def create_app(config_object=Config, **overrides) -> Flask:
     app = Flask(__name__)
+    # 关闭严格斜杠：/products 与 /products/ 都直接命中，避免 308 跳转到
+    # 反向代理后端地址（云部署时会被改写成内部域名，导致链接失效）
+    app.url_map.strict_slashes = False
     app.config.from_object(config_object)
     if overrides:
         app.config.update(overrides)

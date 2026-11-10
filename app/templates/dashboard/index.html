@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% set tab = request.args.get('tab', 'overview') %}
+{% block title %}{{ '情感倾向' if tab == 'sentiment' else '数据概览' }} · {{ app_name }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+  <div>
+    <h1 class="mb-1">{{ '情感倾向' if tab == 'sentiment' else '数据概览' }}</h1>
+    <p class="text-muted mb-0">登录可见只读页；不统计人工审核绩效。</p>
+  </div>
+  {% if tab != 'sentiment' %}
+    <div class="d-flex flex-wrap gap-2 align-items-end">
+      <div>
+        <label class="form-label" for="range">时间范围</label>
+        <select class="form-select" id="range">
+          <option value="all" selected>全部</option>
+          <option value="365">一年内</option>
+          <option value="180">半年内</option>
+        </select>
+      </div>
+      <div>
+        <label class="form-label" for="target">商品/内容</label>
+        <input class="form-control" id="target" placeholder="可选，支持模糊匹配">
+      </div>
+      <button class="btn btn-primary" id="refreshBtn" type="button">刷新</button>
+    </div>
+  {% endif %}
+</div>
+
+<div class="tab-nav mb-3">
+  <a class="tab-link {{ 'active' if tab != 'sentiment' else '' }}" href="{{ url_for('stats.dashboard') }}">总览</a>
+  <a class="tab-link {{ 'active' if tab == 'sentiment' else '' }}" href="{{ url_for('stats.dashboard', tab='sentiment') }}">情感倾向</a>
+</div>
+
+{% if tab == 'sentiment' %}
+  {% include 'dashboard/sentiment.html' %}
+{% else %}
+  <div id="dashboardRoot" data-url="{{ url_for('stats.summary') }}">
+    <div id="dashboardError" class="alert alert-danger" style="display:none;"></div>
+
+    <div class="kpi-grid mb-3">
+      <div class="kpi-card"><div class="kpi-label">区间评论数</div><div class="kpi-value" id="kpi-total">-</div></div>
+      <div class="kpi-card"><div class="kpi-label">今日新增</div><div class="kpi-value" id="kpi-today">-</div></div>
+      <div class="kpi-card"><div class="kpi-label">待复核</div><div class="kpi-value" id="kpi-reviewing">-</div></div>
+      <div class="kpi-card"><div class="kpi-label">待申诉</div><div class="kpi-value" id="kpi-appeals">-</div></div>
+      <div class="kpi-card"><div class="kpi-label">驳回率</div><div class="kpi-value" id="kpi-reject-rate">-</div></div>
+      <div class="kpi-card"><div class="kpi-label">AI 判定覆盖率</div><div class="kpi-value" id="kpi-ai-coverage">-</div></div>
+      <div class="kpi-card"><div class="kpi-label">平均分析耗时</div><div class="kpi-value" id="kpi-avg-ms">-</div></div>
+      <div class="kpi-card"><div class="kpi-label">预估调用成本</div><div class="kpi-value" id="kpi-cost">-</div></div>
+    </div>
+
+    <div class="chart-grid">
+      <div class="card"><div class="card-body"><h2>情感分布</h2><div class="chart" id="chart-sentiment"></div></div></div>
+      <div class="card"><div class="card-body"><h2>违规类型</h2><div class="chart" id="chart-violation"></div></div></div>
+      <div class="card"><div class="card-body"><h2>评论趋势</h2><div class="chart" id="chart-trend"></div></div></div>
+      <div class="card"><div class="card-body"><h2>状态分布</h2><div class="chart" id="chart-status"></div></div></div>
+    </div>
+
+    <p class="meta mt-3 mb-0">最后更新：<span id="lastUpdated">-</span> · 趋势按月聚合当前状态，不是审核动作流水。</p>
+  </div>
+{% endif %}
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='vendor/echarts.min.js') }}"
+        onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js'"></script>
+{% if tab == 'sentiment' %}
+  <script src="{{ url_for('static', filename='js/sentiment.js') }}"></script>
+{% else %}
+  <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endif %}
+{% endblock %}

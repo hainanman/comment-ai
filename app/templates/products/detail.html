@@ -1,0 +1,333 @@
+{% extends "base.html" %}
+{% from "_pagination.html" import render_pagination with context %}
+{% block title %}{{ product.name }} · {{ app_name }}{% endblock %}
+{% block content %}
+<nav class="breadcrumb">
+  <a href="{{ url_for('product.index') }}">商品列表</a>
+  <span>/</span>
+  <a href="{{ url_for('product.index', category=product.category) }}">{{ product.category }}</a>
+  <span>/</span>
+  <span>{{ product.name }}</span>
+</nav>
+
+<section class="product-detail">
+  <div class="product-visual product-visual-lg" style="--product-bg: {{ product.color }};">
+    {% if product.badge %}<span class="product-badge">{{ product.badge }}</span>{% endif %}
+    <img class="product-photo"
+         src="{{ url_for('static', filename=product.photo_local) }}"
+         alt="{{ product.name }}"
+         referrerpolicy="no-referrer"
+         onerror="if(!this.dataset.stage){this.dataset.stage='1';this.src='{{ product.photo }}';}else if(this.dataset.stage==='1'){this.dataset.stage='2';this.src='{{ url_for('static', filename=product.image) }}';}else{this.parentElement.classList.add('img-fallback');this.remove();}">
+    <span class="product-emoji" aria-hidden="true">{{ product.emoji }}</span>
+  </div>
+
+  <div class="product-info">
+    <div class="product-meta">{{ product.category }}</div>
+    <h1 class="product-title">{{ product.name }}</h1>
+    <p class="product-tagline">{{ product.tagline }}</p>
+
+    <div class="product-rating-row">
+      {% if total %}
+        <span class="rating-stars">★ {{ "%.1f"|format(average) }}</span>
+        <span class="meta">{{ total }} 条已发布评论</span>
+        <span class="meta">好评率 {{ "%.0f"|format(positive_rate * 100) }}%</span>
+      {% else %}
+        <span class="meta">暂无已发布评论</span>
+      {% endif %}
+    </div>
+
+    <div class="product-price-box">
+      <span class="product-price-lg">¥{{ "%.0f"|format(product.price) }}</span>
+      <del class="product-original">¥{{ "%.0f"|format(product.original_price) }}</del>
+      <span class="badge bg-info">精选</span>
+    </div>
+
+    <p class="product-description">{{ product.description }}</p>
+
+    <div class="product-tags mb-3">
+      {% for word in product.keywords %}
+        <span class="product-tag">{{ word }}</span>
+      {% endfor %}
+    </div>
+
+    <div class="product-actions">
+      {% if current_user and current_user.role == 'user' %}
+        <a class="btn btn-primary" href="#write-review">写评论</a>
+      {% elif not current_user %}
+        <a class="btn btn-primary" href="{{ url_for('auth.login', next=url_for('product.detail', slug=product.slug)) }}">登录后写评论</a>
+      {% endif %}
+      <a class="btn btn-outline-secondary" href="#reviews">查看评论</a>
+    </div>
+
+    <div class="product-meta-line">
+      <span>商品编号：{{ product.slug }}</span>
+      <span>评论由规则 + AI 审核后展示</span>
+    </div>
+  </div>
+</section>
+
+<section class="product-sentiment card">
+  <div class="sentiment-donut {{ 'empty-donut' if not sentiment.total else '' }}"
+       style="--positive-end: {{ '%.2f'|format(sentiment.positive_rate * 100) }}%; --neutral-end: {{ '%.2f'|format((sentiment.positive_rate + sentiment.neutral_rate) * 100) }}%;">
+    <div class="sentiment-donut-inner">
+      <strong>{{ "%.1f"|format(sentiment.score) }}</strong>
+      <span>RI / 100</span>
+    </div>
+  </div>
+
+  <div class="product-sentiment-main">
+    <p class="eyebrow">商品整体情感倾向</p>
+    <div class="d-flex align-items-center flex-wrap gap-2">
+      <h2 class="mb-0">{{ sentiment.label }}</h2>
+      <span class="badge {{ 'bg-success' if sentiment.label == '好评' else ('bg-danger' if sentiment.label == '差评' else ('bg-warning' if sentiment.label == '样本不足' else 'bg-secondary')) }}">
+        RI {{ "%.1f"|format(sentiment.score) }}
+      </span>
+    </div>
+    <p class="text-muted mt-2 mb-2">基于 {{ sentiment.total }} 条可采信评论聚合</p>
+    <div class="sentiment-legend">
+      <span><i class="legend-dot positive"></i>好评 {{ sentiment.counts.get('positive', 0) }}</span>
+      <span><i class="legend-dot neutral"></i>中评 {{ sentiment.counts.get('neutral', 0) }}</span>
+      <span><i class="legend-dot negative"></i>差评 {{ sentiment.counts.get('negative', 0) }}</span>
+    </div>
+    <div class="sentiment-stack">
+      <span class="positive" style="width: {{ '%.2f'|format(sentiment.positive_rate * 100) }}%"></span>
+      <span class="neutral" style="width: {{ '%.2f'|format(sentiment.neutral_rate * 100) }}%"></span>
+      <span class="negative" style="width: {{ '%.2f'|format(sentiment.negative_rate * 100) }}%"></span>
+    </div>
+    <p class="meta mt-2 mb-0">RI =（好评 + 0.5 × 中评）/ 总样本 × 100；仅统计已发布评论。</p>
+  </div>
+
+  <div class="product-sentiment-side">
+    <h3>近 12 个月差评率</h3>
+    <div class="mini-trend">
+      {% for day in sentiment.trend %}
+        <div class="mini-trend-row">
+          <span>{{ day.day[5:] }}</span>
+          <div class="mini-trend-bar"><span style="width: {{ '%.0f'|format(day.negative_rate * 100) }}%"></span></div>
+          <b>{{ "%.0f"|format(day.negative_rate * 100) }}%</b>
+        </div>
+      {% endfor %}
+    </div>
+    {% if sentiment.negative_keywords %}
+      <h3 class="mt-3">差评关键词</h3>
+      <div class="product-tags">
+        {% for item in sentiment.negative_keywords %}
+          <span class="product-tag">{{ item.word }} · {{ item.count }}</span>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+{% if current_user and current_user.role == 'user' %}
+  <section class="card review-compose" id="write-review">
+    <div class="card-body">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+        <h2 class="mb-0">写评论</h2>
+        <span class="meta">提交后同步做规则初筛和 AI 分析</span>
+      </div>
+      {% if form_error %}
+        <div class="alert alert-danger">{{ form_error }}</div>
+      {% endif %}
+      <form method="post" action="{{ url_for('product.submit_comment', slug=product.slug) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="row">
+          <div class="col-md-3 mb-2">
+            <label class="form-label" for="rating">评分</label>
+            {% set selected_rating = form_rating|default(5)|int %}
+            <select class="form-select" id="rating" name="rating">
+              {% for i in range(1, 6) %}
+                <option value="{{ i }}" {{ 'selected' if selected_rating == i else '' }}>{{ i }} 分</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-9 mb-2">
+            <label class="form-label" for="content">评论内容</label>
+            <textarea class="form-control" id="content" name="content" rows="4"
+                      minlength="5" maxlength="{{ config['MAX_COMMENT_LENGTH'] }}"
+                      placeholder="围绕 {{ product.name }} 的真实体验，写 5—{{ config['MAX_COMMENT_LENGTH'] }} 字"
+                      required>{{ form_content|default('') }}</textarea>
+            <div class="form-text">差评也可以正常发表；广告、辱骂、刷单等才会被拦截或转复核。</div>
+          </div>
+        </div>
+        <div class="d-flex flex-wrap align-items-center gap-2 mt-1">
+          <button class="btn btn-primary" type="submit">提交并分析</button>
+          <a class="btn btn-outline-secondary" href="{{ url_for('comment.my_comments') }}">我的评论</a>
+        </div>
+      </form>
+    </div>
+  </section>
+{% elif not current_user %}
+  <section class="card review-compose" id="write-review">
+    <div class="card-body d-flex justify-content-between align-items-center flex-wrap gap-2">
+      <div>
+        <h2 class="mb-1">写评论</h2>
+        <p class="text-muted mb-0">登录后即可对 {{ product.name }} 发表评论。</p>
+      </div>
+      <a class="btn btn-primary" href="{{ url_for('auth.login', next=url_for('product.detail', slug=product.slug)) }}">去登录</a>
+    </div>
+  </section>
+{% else %}
+  <section class="card review-compose" id="write-review">
+    <div class="card-body">
+      <h2>写评论</h2>
+      <p class="text-muted mb-0">审核员/管理员账号不参与发表评论。</p>
+    </div>
+  </section>
+{% endif %}
+
+<div class="row mt-4">
+  <div class="col-md-8">
+    <div class="card mb-3">
+      <div class="card-body">
+        <h2>商品介绍</h2>
+        <p class="text-muted">{{ product.description }}</p>
+        <div class="feature-grid">
+          {% for feature in product.features %}
+            <div class="feature-item"><span>✓</span>{{ feature }}</div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <div class="card" id="reviews">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+          <h2 class="mb-0">用户评论</h2>
+          <span class="meta">
+            {% if keyword or sentiment_filter %}
+              匹配 {{ pagination.total }} 条 · 全部 {{ total }} 条
+            {% else %}
+              共 {{ total }} 条已发布评论
+            {% endif %}
+          </span>
+        </div>
+
+        <div class="review-toolbar">
+          <div class="sentiment-filters">
+            <a class="sentiment-filter {{ 'active' if not sentiment_filter else '' }}"
+               href="{{ url_for('product.detail', slug=product.slug, keyword=keyword) }}#reviews">
+              全部 <b>{{ total }}</b>
+            </a>
+            <a class="sentiment-filter {{ 'active' if sentiment_filter == 'positive' else '' }}"
+               href="{{ url_for('product.detail', slug=product.slug, sentiment='positive', keyword=keyword) }}#reviews">
+              好评 <b>{{ sentiment_counts.get('positive', 0) }}</b>
+            </a>
+            <a class="sentiment-filter {{ 'active' if sentiment_filter == 'neutral' else '' }}"
+               href="{{ url_for('product.detail', slug=product.slug, sentiment='neutral', keyword=keyword) }}#reviews">
+              中评 <b>{{ sentiment_counts.get('neutral', 0) }}</b>
+            </a>
+            <a class="sentiment-filter {{ 'active' if sentiment_filter == 'negative' else '' }}"
+               href="{{ url_for('product.detail', slug=product.slug, sentiment='negative', keyword=keyword) }}#reviews">
+              差评 <b>{{ sentiment_counts.get('negative', 0) }}</b>
+            </a>
+          </div>
+
+          {% if keyword %}
+            <div class="keyword-filter-note">
+              正在筛选关键词：<strong>{{ keyword }}</strong>
+              <a href="{{ url_for('product.detail', slug=product.slug, sentiment=sentiment_filter, page=1) }}#reviews">清除</a>
+            </div>
+          {% endif %}
+
+          <div class="keyword-groups">
+            {% for key, label in [('positive', '好评关键词'), ('neutral', '中评关键词'), ('negative', '差评关键词')] %}
+              {% if keyword_groups.get(key) %}
+                <div class="keyword-group">
+                  <span class="keyword-group-label">{{ label }}</span>
+                  {% for item in keyword_groups[key] %}
+                    <a class="keyword-chip {{ 'active' if keyword == item.word and sentiment_filter == key else '' }}"
+                       href="{{ url_for('product.detail', slug=product.slug, sentiment=key, keyword=item.word) }}#reviews">
+                      {{ item.word }} <span>{{ item.count }}</span>
+                    </a>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+
+        {% for comment in pagination.items %}
+          <article class="review-item">
+            <div class="review-head">
+              <strong>{{ comment.user.username if comment.user else '匿名用户' }}</strong>
+              <span class="meta">{{ comment.created_at|dt }}</span>
+            </div>
+            <div class="review-stars">
+              {% for i in range(1, 6) %}
+                <span class="{{ 'on' if i <= comment.rating else 'off' }}">★</span>
+              {% endfor %}
+              <span class="meta ms-2">{{ comment.rating }}/5</span>
+            </div>
+            <div class="review-judgment">
+              <span class="badge {{ 'bg-success' if comment.sentiment == 'positive' else ('bg-danger' if comment.sentiment == 'negative' else 'bg-secondary') }}">
+                AI 情感：{{ comment.sentiment_tendency_label }}
+              </span>
+              <span class="meta">置信度 {{ comment.sentiment_confidence|pct }}</span>
+              {% if comment.is_sarcasm %}<span class="badge bg-warning">反讽</span>{% endif %}
+              <span class="meta">· {{ comment.engine_label }}</span>
+            </div>
+            <p class="comment-content mt-2 mb-2">{{ comment.content }}</p>
+            <div>
+              {% for word in comment.keywords or [] %}
+                <span class="keyword">{{ word }}</span>
+              {% endfor %}
+            </div>
+          </article>
+        {% else %}
+          <div class="empty">
+            {% if keyword or sentiment_filter %}
+              没有匹配的评论。<a href="{{ url_for('product.detail', slug=product.slug, page=1) }}#reviews">清除筛选</a>
+            {% else %}
+              这件商品还没有已发布评论。{% if current_user and current_user.role == 'user' %}<a href="#write-review">写第一条</a>{% endif %}
+            {% endif %}
+          </div>
+        {% endfor %}
+
+        {{ render_pagination(pagination) }}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card mb-3">
+      <div class="card-body">
+        <h3>评论概览</h3>
+        {% set denominator = total if total else 1 %}
+        <div class="sentiment-row">
+          <span>好评</span>
+          <div class="sentiment-bar"><span class="positive" style="width: {{ '%.0f'|format(sentiment_counts.get('positive', 0) / denominator * 100) }}%"></span></div>
+          <b>{{ sentiment_counts.get('positive', 0) }}</b>
+        </div>
+        <div class="sentiment-row">
+          <span>中评</span>
+          <div class="sentiment-bar"><span class="neutral" style="width: {{ '%.0f'|format(sentiment_counts.get('neutral', 0) / denominator * 100) }}%"></span></div>
+          <b>{{ sentiment_counts.get('neutral', 0) }}</b>
+        </div>
+        <div class="sentiment-row">
+          <span>差评</span>
+          <div class="sentiment-bar"><span class="negative" style="width: {{ '%.0f'|format(sentiment_counts.get('negative', 0) / denominator * 100) }}%"></span></div>
+          <b>{{ sentiment_counts.get('negative', 0) }}</b>
+        </div>
+        <hr>
+        <p class="meta mb-0">好评率 {{ "%.0f"|format(positive_rate * 100) }}% · 平均评分 {{ "%.1f"|format(average) if total else '—' }}</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        <h3>商品标签</h3>
+        <div class="product-tags">
+          {% for word in product.keywords %}
+            <span class="product-tag">{{ word }}</span>
+          {% endfor %}
+        </div>
+        <p class="text-muted small mt-3 mb-0">标签来自商品目录，用于帮助理解评论主题。</p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/product-reviews.js') }}"></script>
+{% endblock %}

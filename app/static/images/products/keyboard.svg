@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="机械键盘商品图">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fbf7ff"/>
+      <stop offset="1" stop-color="#d8c4ff"/>
+    </linearGradient>
+    <linearGradient id="deck" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2e1065"/>
+      <stop offset="1" stop-color="#111827"/>
+    </linearGradient>
+    <linearGradient id="key" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4c1d95"/>
+      <stop offset="1" stop-color="#1e1b4b"/>
+    </linearGradient>
+    <filter id="blur"><feGaussianBlur stdDeviation="18"/></filter>
+  </defs>
+  <rect width="800" height="600" fill="url(#bg)"/>
+  <circle cx="690" cy="110" r="150" fill="#fff" opacity=".28"/>
+  <ellipse cx="400" cy="475" rx="280" ry="30" fill="#4c1d95" opacity=".18" filter="url(#blur)"/>
+  <g transform="rotate(-5 400 330)">
+    <rect x="120" y="210" width="560" height="245" rx="28" fill="url(#deck)" stroke="#7c3aed" stroke-width="3"/>
+    <rect x="140" y="230" width="520" height="205" rx="16" fill="#1e1b4b" opacity=".8"/>
+    <g fill="url(#key)" stroke="#8b5cf6" stroke-width="1.2">
+      <rect x="158" y="246" width="54" height="38" rx="7"/><rect x="220" y="246" width="54" height="38" rx="7"/><rect x="282" y="246" width="54" height="38" rx="7"/><rect x="344" y="246" width="54" height="38" rx="7"/><rect x="406" y="246" width="54" height="38" rx="7"/><rect x="468" y="246" width="54" height="38" rx="7"/><rect x="530" y="246" width="54" height="38" rx="7"/><rect x="592" y="246" width="46" height="38" rx="7"/>
+      <rect x="158" y="292" width="70" height="38" rx="7"/><rect x="236" y="292" width="54" height="38" rx="7"/><rect x="298" y="292" width="54" height="38" rx="7"/><rect x="360" y="292" width="54" height="38" rx="7"/><rect x="422" y="292" width="54" height="38" rx="7"/><rect x="484" y="292" width="54" height="38" rx="7"/><rect x="546" y="292" width="92" height="38" rx="7"/>
+      <rect x="158" y="338" width="86" height="38" rx="7"/><rect x="252" y="338" width="54" height="38" rx="7"/><rect x="314" y="338" width="54" height="38" rx="7"/><rect x="376" y="338" width="54" height="38" rx="7"/><rect x="438" y="338" width="54" height="38" rx="7"/><rect x="500" y="338" width="54" height="38" rx="7"/><rect x="562" y="338" width="76" height="38" rx="7"/>
+      <rect x="158" y="384" width="100" height="34" rx="7"/><rect x="266" y="384" width="260" height="34" rx="7"/><rect x="534" y="384" width="104" height="34" rx="7"/>
+    </g>
+    <rect x="140" y="430" width="520" height="5" rx="2.5" fill="#22d3ee" opacity=".8"/>
+  </g>
+  <text x="400" y="552" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="18" fill="#4c1d95" opacity=".6" letter-spacing="5">TYPE / 87</text>
+</svg>

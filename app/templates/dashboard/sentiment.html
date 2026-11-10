@@ -1,0 +1,88 @@
+<div id="sentimentRoot" data-url="{{ url_for('stats.sentiment') }}">
+  <div class="d-flex justify-content-between align-items-end flex-wrap gap-2 mb-3">
+    <p class="text-muted mb-0">仅统计<strong>已发布</strong>评论；直接复用情感判别结果，不重复调用模型。</p>
+    <div class="d-flex flex-wrap gap-2 align-items-end">
+      <div>
+        <label class="form-label" for="sentimentRange">时间范围</label>
+        <select class="form-select" id="sentimentRange">
+          <option value="all" selected>全部</option>
+          <option value="365">一年内</option>
+          <option value="180">半年内</option>
+        </select>
+      </div>
+      <div>
+        <label class="form-label" for="sentimentTarget">商品</label>
+        <input class="form-control" id="sentimentTarget" placeholder="可选，支持模糊匹配">
+      </div>
+      <button class="btn btn-primary" id="sentimentRefresh" type="button">刷新</button>
+    </div>
+  </div>
+
+  <div id="sentimentError" class="alert alert-danger" style="display:none;"></div>
+  <div id="sentimentAlert" class="alert alert-info">正在加载情感倾向…</div>
+
+  <div class="kpi-grid mb-3">
+    <div class="kpi-card"><div class="kpi-label">评论总数</div><div class="kpi-value" id="s-total">-</div></div>
+    <div class="kpi-card"><div class="kpi-label">好评率</div><div class="kpi-value" id="s-positive-rate">-</div></div>
+    <div class="kpi-card"><div class="kpi-label">差评率</div><div class="kpi-value" id="s-negative-rate">-</div></div>
+    <div class="kpi-card"><div class="kpi-label">差评评论</div><div class="kpi-value" id="s-negative-count">-</div></div>
+    <div class="kpi-card"><div class="kpi-label">平均评分</div><div class="kpi-value" id="s-average">-</div></div>
+    <div class="kpi-card"><div class="kpi-label">差评率变化</div><div class="kpi-value" id="s-delta">-</div></div>
+  </div>
+
+  <div class="chart-grid">
+    <div class="card chart-wide">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+          <h2 class="mb-0">情感趋势</h2>
+          <span class="meta">按月聚合</span>
+        </div>
+        <div class="chart" id="chart-sentiment-trend"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-body">
+        <h2>各商品差评率</h2>
+        <div class="chart" id="chart-sentiment-product"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-body">
+        <h2>差评评论关键词</h2>
+        <div class="chart" id="chart-sentiment-keywords"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mt-3">
+    <div class="col-md-7">
+      <div class="card">
+        <div class="card-body">
+          <h2>商品情感明细</h2>
+          <div class="table-responsive">
+            <table class="table table-sm table-hover">
+              <thead>
+                <tr><th>商品</th><th>评论数</th><th>好评率</th><th>差评率</th><th>平均分</th></tr>
+              </thead>
+              <tbody id="sentiment-product-body">
+                <tr><td colspan="5" class="text-muted">加载中…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-5">
+      <div class="card">
+        <div class="card-body">
+          <h2>最近差评评论</h2>
+          <div id="recent-negative-list" class="sentiment-recent">
+            <p class="text-muted">加载中…</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p class="meta mt-3 mb-0">最后更新：<span id="sentimentUpdated">-</span> · 与“总览”使用同一批评论数据，不额外调用模型。</p>
+</div>

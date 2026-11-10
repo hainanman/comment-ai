@@ -1,0 +1,220 @@
+[
+  {
+    "name": "正常好评",
+    "content": "音质不错，戴了一天也不夹耳朵，物流很快。",
+    "expected_status": "published",
+    "expected_type": "none",
+    "expected_sentiment": "positive",
+    "status": "published",
+    "violation_type": "none",
+    "sentiment": "positive",
+    "risk_score": 0.15,
+    "engine": "llm",
+    "analysis_ms": 2298,
+    "keywords": [
+      "音质",
+      "物流",
+      "耳朵",
+      "不错"
+    ],
+    "reason": "正面描述音质、佩戴舒适性和物流速度，无负面暗示或违规内容。",
+    "status_ok": true,
+    "type_ok": true,
+    "sentiment_ok": true
+  },
+  {
+    "name": "普通差评",
+    "content": "用了三天就断连，客服也不回消息。",
+    "expected_status": "published",
+    "expected_type": "none",
+    "expected_sentiment": "negative",
+    "status": "published",
+    "violation_type": "none",
+    "sentiment": "negative",
+    "risk_score": 0.25,
+    "engine": "llm",
+    "analysis_ms": 1949,
+    "keywords": [
+      "消息"
+    ],
+    "reason": "明确抱怨断连故障和客服失联，表达真实不满",
+    "status_ok": true,
+    "type_ok": true,
+    "sentiment_ok": true
+  },
+  {
+    "name": "中性评价",
+    "content": "包装一般，功能符合预期。",
+    "expected_status": "published",
+    "expected_type": "none",
+    "expected_sentiment": "neutral",
+    "status": "published",
+    "violation_type": "none",
+    "sentiment": "neutral",
+    "risk_score": 0.1,
+    "engine": "llm",
+    "analysis_ms": 2184,
+    "keywords": [
+      "符合",
+      "包装",
+      "功能",
+      "一般",
+      "预期"
+    ],
+    "reason": "客观描述包装和功能，无情绪倾向词，未提负面体验或违规内容。",
+    "status_ok": true,
+    "type_ok": true,
+    "sentiment_ok": true
+  },
+  {
+    "name": "广告引流",
+    "content": "加V：abc123，同款低价，需要的私聊。",
+    "expected_status": "rejected",
+    "expected_type": "ad",
+    "expected_sentiment": "neutral",
+    "status": "rejected",
+    "violation_type": "ad",
+    "sentiment": "neutral",
+    "risk_score": 1.0,
+    "engine": "rule",
+    "analysis_ms": 1,
+    "keywords": [
+      "私聊",
+      "低价",
+      "同款",
+      "需要"
+    ],
+    "reason": "规则命中：加V、私聊",
+    "status_ok": true,
+    "type_ok": true,
+    "sentiment_ok": true
+  },
+  {
+    "name": "刷单返利",
+    "content": "好评返现 5 元，截图联系客服。",
+    "expected_status": "rejected",
+    "expected_type": "fraud",
+    "expected_sentiment": "neutral",
+    "status": "rejected",
+    "violation_type": "fraud",
+    "sentiment": "neutral",
+    "risk_score": 0.85,
+    "engine": "llm",
+    "analysis_ms": 2257,
+    "keywords": [
+      "截图",
+      "联系",
+      "好评"
+    ],
+    "reason": "明确提及‘好评返现’，诱导虚假好评，属刷单返利行为。",
+    "status_ok": true,
+    "type_ok": true,
+    "sentiment_ok": true
+  },
+  {
+    "name": "辱骂攻击",
+    "content": "垃圾东西，客服都是废物。",
+    "expected_status": "rejected",
+    "expected_type": "abuse",
+    "expected_sentiment": "negative",
+    "status": "rejected",
+    "violation_type": "abuse",
+    "sentiment": "negative",
+    "risk_score": 0.85,
+    "engine": "llm",
+    "analysis_ms": 2227,
+    "keywords": [
+      "垃圾",
+      "废物"
+    ],
+    "reason": "使用'垃圾''废物'辱骂商品和客服，含人身攻击倾向",
+    "status_ok": true,
+    "type_ok": true,
+    "sentiment_ok": true
+  },
+  {
+    "name": "反讽差评",
+    "content": "戴了一天耳朵就发炎，这耳机真是绝了。",
+    "expected_status": "published",
+    "expected_type": "none",
+    "expected_sentiment": "negative",
+    "status": "published",
+    "violation_type": "none",
+    "sentiment": "negative",
+    "risk_score": 0.15,
+    "engine": "llm",
+    "analysis_ms": 2190,
+    "keywords": [
+      "发炎",
+      "耳机",
+      "耳朵"
+    ],
+    "reason": "‘真是绝了’为反讽，实际表达耳机致耳朵发炎的负面体验。",
+    "status_ok": true,
+    "type_ok": true,
+    "sentiment_ok": true
+  },
+  {
+    "name": "无关内容",
+    "content": "今天天气不错，顺便来打个卡。",
+    "expected_status": "reviewing",
+    "expected_type": "irrelevant",
+    "expected_sentiment": "neutral",
+    "status": "reviewing",
+    "violation_type": "irrelevant",
+    "sentiment": "neutral",
+    "risk_score": 0.65,
+    "engine": "llm",
+    "analysis_ms": 2193,
+    "keywords": [
+      "不错"
+    ],
+    "reason": "评论与降噪耳机无任何关联，纯打卡式无关内容",
+    "status_ok": true,
+    "type_ok": true,
+    "sentiment_ok": true
+  },
+  {
+    "name": "虚假宣传",
+    "content": "全网最低价，绝对降噪第一，买它！",
+    "expected_status": "reviewing",
+    "expected_type": "false_promo",
+    "expected_sentiment": "positive",
+    "status": "reviewing",
+    "violation_type": "false_promo",
+    "sentiment": "positive",
+    "risk_score": 0.75,
+    "engine": "llm",
+    "analysis_ms": 2399,
+    "keywords": [
+      "降噪",
+      "全网",
+      "最低价"
+    ],
+    "reason": "使用'全网最低价''绝对降噪第一'等无依据夸大宣传用语",
+    "status_ok": true,
+    "type_ok": true,
+    "sentiment_ok": true
+  },
+  {
+    "name": "直接拦截",
+    "content": "\u4ee3\u5f00\u53d1\u7968，联系 QQ123456。",
+    "expected_status": "rejected",
+    "expected_type": "other",
+    "expected_sentiment": "neutral",
+    "status": "rejected",
+    "violation_type": "other",
+    "sentiment": "neutral",
+    "risk_score": 1.0,
+    "engine": "rule",
+    "analysis_ms": 1,
+    "keywords": [
+      "开发票",
+      "联系"
+    ],
+    "reason": "规则命中：\u4ee3\u5f00\u53d1\u7968、QQ123456",
+    "status_ok": true,
+    "type_ok": true,
+    "sentiment_ok": true
+  }
+]

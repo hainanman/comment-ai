@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% from "_pagination.html" import render_pagination with context %}
+{% block title %}我的评论 · {{ app_name }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+  <div>
+    <h1 class="mb-1">我的评论</h1>
+    <p class="text-muted mb-0">查看审核状态；已驳回评论可以发起一次申诉。</p>
+  </div>
+  <a class="btn btn-primary" href="{{ url_for('product.index') }}">去商品列表写评论</a>
+</div>
+
+{% for comment in pagination.items %}
+  {% set badge = 'bg-success' if comment.status == 'published' else ('bg-warning' if comment.status == 'reviewing' else ('bg-danger' if comment.status == 'rejected' else 'bg-secondary')) %}
+  <article class="card mb-3">
+    <div class="card-body">
+      <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+        <div>
+          {% if comment.product_slug %}
+            <a class="fw-bold text-decoration-none" href="{{ url_for('product.detail', slug=comment.product_slug) }}">{{ comment.target_name }}</a>
+          {% else %}
+            <strong>{{ comment.target_name }}</strong>
+          {% endif %}
+          <span class="badge {{ badge }}">{{ comment.status_label }}</span>
+          {% if comment.appeal_status != 'none' %}
+            <span class="badge bg-info">{{ comment.appeal_label }}</span>
+          {% endif %}
+        </div>
+        <span class="meta">{{ comment.created_at|dt }}</span>
+      </div>
+
+      <p class="comment-content mt-2 mb-2">{{ comment.content }}</p>
+      <div class="mb-2">
+        {% for word in comment.keywords or [] %}
+          <span class="keyword">{{ word }}</span>
+        {% endfor %}
+      </div>
+      <p class="meta mb-2">{{ comment.user_message }}</p>
+
+      {% if comment.appeal_status == 'pending' %}
+        <p class="meta mb-2">申诉时间：{{ comment.appealed_at|dt }}</p>
+      {% endif %}
+
+      <div class="d-flex flex-wrap gap-2">
+        <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('comment.result', comment_id=comment.id) }}">查看详情</a>
+        {% if comment.is_appealable %}
+          <form method="post" action="{{ url_for('comment.appeal', comment_id=comment.id) }}"
+                onsubmit="return confirm('确定对该评论发起申诉吗？每条评论只能申诉一次。');">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="btn btn-sm btn-warning" type="submit">申诉</button>
+          </form>
+        {% endif %}
+      </div>
+    </div>
+  </article>
+{% else %}
+  <div class="card card-body empty">还没有评论。<a href="{{ url_for('product.index') }}">去商品列表写一条</a></div>
+{% endfor %}
+
+{{ render_pagination(pagination) }}
+{% endblock %}

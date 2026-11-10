@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}请求无效 · {{ app_name }}{% endblock %}
+{% block content %}
+<div class="card card-body text-center">
+  <h1>400</h1>
+  <p class="text-muted">{{ message or '请求无效，请检查表单后重试。' }}</p>
+  <a class="btn btn-primary" href="{{ url_for('comment.index') }}">返回首页</a>
+</div>
+{% endblock %}

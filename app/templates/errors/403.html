@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}无权限 · {{ app_name }}{% endblock %}
+{% block content %}
+<div class="card card-body text-center">
+  <h1>403</h1>
+  <p class="text-muted">当前账号没有权限访问该页面。</p>
+  <a class="btn btn-primary" href="{{ url_for('comment.index') }}">返回评论广场</a>
+</div>
+{% endblock %}

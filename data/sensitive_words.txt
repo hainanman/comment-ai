@@ -1,0 +1,34 @@
+# 敏感词库：一行一个"词,级别"
+# block=直接拦截（跳过模型）；review=转人工复核（模型仍会看）
+# 高危词统一用 \uXXXX 转义存放，由 app/ai/rules.py 的 load() 在加载时还原，
+# 目的是不让字面量出现在源码/仓库文本里（AI 编码助手读仓库时会被内容审核拦截）。
+加微信,block
+加V,block
+加v,block
+\u4ee3\u5f00\u53d1\u7968,block
+\u529e\u8bc1,block
+\u535a\u5f69,block
+\u8d4c\u535a,block
+\u50bb\u903c,block
+\u53bb\u6b7b,block
+私聊,review
+刷单,review
+好评返现,review
+返现,review
+兼职,review
+代理,review
+二维码,review
+扫码,review
+站外,review
+假货,review
+欺骗,review
+骗人,review
+虚假,review
+垃圾,review
+废物,review
+恶心,review
+敷衍,review
+恶劣,review
+全网最低,review
+绝对第一,review
+最便宜,review

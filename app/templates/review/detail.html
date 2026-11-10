@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block title %}复核详情 · {{ app_name }}{% endblock %}
+{% block content %}
+{% set is_appeal = comment.status == 'rejected' and comment.appeal_status == 'pending' %}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+  <div>
+    <h1 class="mb-1">{{ '申诉复审' if is_appeal else '待复核详情' }}</h1>
+    <p class="text-muted mb-0">
+      评论 #{{ comment.id }} ·
+      {% if comment.product_slug %}
+        <a href="{{ url_for('product.detail', slug=comment.product_slug) }}">{{ comment.target_name }}</a>
+      {% else %}
+        {{ comment.target_name }}
+      {% endif %}
+      · {{ comment.created_at|dt }}
+    </p>
+  </div>
+  <a class="btn btn-outline-secondary" href="{{ url_for('review.appeals') if is_appeal else url_for('review.queue') }}">返回队列</a>
+</div>
+
+<div class="row">
+  <div class="col-md-7">
+    <div class="card mb-3">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+          <h2 class="mb-1">评论原文</h2>
+          <span class="badge {{ 'bg-warning' if is_appeal else 'bg-primary' }}">{{ comment.status_label }}</span>
+        </div>
+        <p class="comment-content mt-2">{{ comment.content }}</p>
+        <hr>
+        <div class="meta">
+          用户：{{ comment.user.username if comment.user else '-' }} ·
+          评分：{{ comment.rating }}/5 ·
+          提交：{{ comment.created_at|dt }}
+        </div>
+        {% if comment.appeal_status != 'none' %}
+          <div class="meta mt-1">申诉状态：{{ comment.appeal_label }} · {{ comment.appealed_at|dt }}</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        <h2>AI 判定结果</h2>
+        <table class="table table-sm">
+          <tbody>
+            <tr>
+              <th>情感</th>
+              <td>
+                {{ comment.sentiment_label }}（置信度 {{ comment.sentiment_confidence|pct }}）
+                {% if comment.sentiment_confidence is not none and (comment.sentiment_confidence|float) < 0.6 %}
+                  <span class="badge bg-warning ms-2">低置信度</span>
+                {% endif %}
+              </td>
+            </tr>
+            <tr><th>违规类型</th><td>{{ comment.violation_label }}</td></tr>
+            <tr><th>风险分</th><td>{{ '%.2f'|format(comment.risk_score or 0) }}</td></tr>
+            <tr><th>反讽</th><td>{{ '是' if comment.is_sarcasm else '否' }}</td></tr>
+            <tr><th>关键词</th>
+              <td>
+                {% for word in comment.keywords or [] %}
+                  <span class="keyword">{{ word }}</span>
+                {% endfor %}
+              </td>
+            </tr>
+            <tr><th>分析方式</th><td>{{ comment.engine_label }}</td></tr>
+            <tr><th>AI 理由</th><td>{{ comment.reason or '-' }}</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-5">
+    <div class="card mb-3">
+      <div class="card-body">
+        <h2>AI 轨迹</h2>
+        {% if comment.trace %}
+          <p class="meta mb-2">
+            规则 {{ comment.trace.rule_ms or 0 }}ms · 模型 {{ comment.trace.llm_ms or 0 }}ms ·
+            总耗时 {{ comment.analysis_ms or 0 }}ms · 决策 {{ comment.trace.decision }}
+          </p>
+          <h3 class="mt-3">规则命中</h3>
+          {% if comment.trace.rule_hits %}
+            <ul class="small">
+              {% for hit in comment.trace.rule_hits %}
+                <li>{{ hit.kind }}：{{ hit.value }}（{{ hit.action }}）</li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p class="meta">无规则命中。</p>
+          {% endif %}
+          <details class="mt-3">
+            <summary class="small text-muted">查看模型原始输出</summary>
+            <div class="trace-box mt-2"><pre>{{ comment.trace.llm_raw or '（无）' }}</pre></div>
+          </details>
+        {% else %}
+          <p class="meta">该评论没有 AI 轨迹记录。</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        <h2>审核操作</h2>
+        <p class="text-muted small">人工操作只改当前状态，不记录审核人/时间/理由。</p>
+        <form method="post" action="{{ url_for('review.action', comment_id=comment.id) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <div class="d-flex flex-wrap gap-2">
+            <button class="btn btn-success" name="action" value="approve" type="submit">通过并发布</button>
+            <button class="btn btn-danger" name="action" value="reject" type="submit">驳回</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,14 @@
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+pytest-cache-files-*/
+pip-*/
+jieba.cache
+.env
+instance/
+logs/*.log
+backup/*.sql
+comment_ai.db
+*.sqlite
+.DS_Store

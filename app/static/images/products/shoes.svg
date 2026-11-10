@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="运动鞋商品图">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fff7ed"/>
+      <stop offset="1" stop-color="#fdba74"/>
+    </linearGradient>
+    <linearGradient id="shoe" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fb923c"/>
+      <stop offset=".55" stop-color="#ea580c"/>
+      <stop offset="1" stop-color="#7c2d12"/>
+    </linearGradient>
+    <linearGradient id="sole" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f8fafc"/>
+      <stop offset="1" stop-color="#cbd5e1"/>
+    </linearGradient>
+    <filter id="blur"><feGaussianBlur stdDeviation="16"/></filter>
+  </defs>
+  <rect width="800" height="600" fill="url(#bg)"/>
+  <circle cx="660" cy="100" r="150" fill="#fff" opacity=".32"/>
+  <ellipse cx="395" cy="500" rx="270" ry="28" fill="#7c2d12" opacity=".18" filter="url(#blur)"/>
+  <path d="M150 445c30-55 78-86 140-103l48-12 30-78c9-24 39-31 58-13l64 62 98 19c48 9 77 38 91 82 8 25-7 46-34 49l-410 27c-57 4-95-8-85-33z" fill="url(#shoe)"/>
+  <path d="M150 445c50 22 110 28 185 24l310-20c22-2 35-18 30-38l-5-17c-15 37-51 51-102 54l-270 14c-67 3-117-2-148-17z" fill="url(#sole)"/>
+  <path d="M292 330l65-24 22 33-66 25z" fill="#ffedd5" opacity=".8"/>
+  <path d="M318 300l54-20 17 26-55 21z" fill="#ffedd5" opacity=".65"/>
+  <path d="M280 370c35 15 82 18 135 16" fill="none" stroke="#fff7ed" stroke-width="8" stroke-linecap="round" opacity=".7"/>
+  <path d="M360 285c30 15 62 42 82 77" fill="none" stroke="#7c2d12" stroke-width="5" opacity=".38"/>
+  <path d="M180 426c90 18 190 22 300 12" fill="none" stroke="#7c2d12" stroke-width="3" opacity=".25"/>
+  <text x="400" y="552" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="18" fill="#9a3412" opacity=".6" letter-spacing="5">RUN / LIGHT</text>
+</svg>

@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}服务器错误 · {{ app_name }}{% endblock %}
+{% block content %}
+<div class="card card-body text-center">
+  <h1>500</h1>
+  <p class="text-muted">服务器处理请求时出错，请稍后重试或查看日志。</p>
+  <a class="btn btn-primary" href="{{ url_for('comment.index') }}">返回评论广场</a>
+</div>
+{% endblock %}

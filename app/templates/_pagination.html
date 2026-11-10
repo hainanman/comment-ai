@@ -1,0 +1,31 @@
+{% macro render_pagination(p) %}
+  {% if p.pages > 1 %}
+    <nav aria-label="分页">
+      <ul class="pagination">
+        <li class="page-item {{ 'disabled' if not p.has_prev else '' }}">
+          {% if p.has_prev %}
+            <a class="page-link" href="{{ page_url(p.prev_num) }}">上一页</a>
+          {% else %}
+            <span class="page-link">上一页</span>
+          {% endif %}
+        </li>
+        {% for page in p.iter_pages(left_edge=1, left_current=2, right_current=2, right_edge=1) %}
+          {% if page %}
+            <li class="page-item {{ 'active' if page == p.page else '' }}">
+              <a class="page-link" href="{{ page_url(page) }}">{{ page }}</a>
+            </li>
+          {% else %}
+            <li class="page-item disabled"><span class="page-link">…</span></li>
+          {% endif %}
+        {% endfor %}
+        <li class="page-item {{ 'disabled' if not p.has_next else '' }}">
+          {% if p.has_next %}
+            <a class="page-link" href="{{ page_url(p.next_num) }}">下一页</a>
+          {% else %}
+            <span class="page-link">下一页</span>
+          {% endif %}
+        </li>
+      </ul>
+    </nav>
+  {% endif %}
+{% endmacro %}

@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block title %}商品列表 · {{ app_name }}{% endblock %}
+{% block content %}
+<section class="product-hero-head">
+  <div>
+    <p class="eyebrow">SHOP / 精选商品</p>
+    <h1>挑一件商品，看看大家怎么说</h1>
+    <p class="text-muted mb-0">精选好物与真实评论；每条评论都会经过规则初筛和 AI 语义分析。</p>
+  </div>
+  <div class="product-count">
+    <strong>{{ products|length }}</strong>
+    <span>件商品</span>
+  </div>
+</section>
+
+<form class="card card-body product-search" method="get">
+  <div class="row">
+    <div class="col-md-6 mb-2">
+      <label class="form-label" for="q">搜索商品</label>
+      <input class="form-control" id="q" name="q" value="{{ q }}" placeholder="商品名、卖点或关键词，例如：降噪、键盘">
+    </div>
+    <div class="col-md-4 mb-2">
+      <label class="form-label" for="category">品类</label>
+      <select class="form-select" id="category" name="category">
+        <option value="">全部品类</option>
+        {% for item in categories %}
+          <option value="{{ item }}" {{ 'selected' if category == item else '' }}>{{ item }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2 mb-2 d-flex align-items-end gap-2">
+      <button class="btn btn-primary w-100" type="submit">搜索</button>
+    </div>
+  </div>
+</form>
+
+<div class="category-pills mb-3">
+  <a class="category-pill {{ 'active' if not category else '' }}" href="{{ url_for('product.index', q=q) }}">全部</a>
+  {% for item in categories %}
+    <a class="category-pill {{ 'active' if category == item else '' }}"
+       href="{{ url_for('product.index', category=item, q=q) }}">{{ item }}</a>
+  {% endfor %}
+</div>
+
+<div class="product-grid">
+  {% for product in products %}
+    {% set stat = stats.get(product.name, {}) %}
+    <a class="product-card" href="{{ url_for('product.detail', slug=product.slug) }}">
+      <div class="product-visual" style="--product-bg: {{ product.color }};">
+        {% if product.badge %}<span class="product-badge">{{ product.badge }}</span>{% endif %}
+        <img class="product-photo"
+             src="{{ url_for('static', filename=product.photo_local) }}"
+             alt="{{ product.name }}"
+             loading="lazy"
+             referrerpolicy="no-referrer"
+             onerror="if(!this.dataset.stage){this.dataset.stage='1';this.src='{{ product.photo }}';}else if(this.dataset.stage==='1'){this.dataset.stage='2';this.src='{{ url_for('static', filename=product.image) }}';}else{this.parentElement.classList.add('img-fallback');this.remove();}">
+        <span class="product-emoji" aria-hidden="true">{{ product.emoji }}</span>
+      </div>
+      <div class="product-body">
+        <div class="product-meta">{{ product.category }}</div>
+        <h2>{{ product.name }}</h2>
+        <p class="product-tagline">{{ product.tagline }}</p>
+        <div class="product-tags">
+          {% for word in product.keywords[:3] %}
+            <span class="product-tag">{{ word }}</span>
+          {% endfor %}
+        </div>
+        {% set sentiment_label = stat.get('label', '暂无评价') %}
+        <div class="product-card-sentiment">
+          <div class="d-flex justify-content-between align-items-center gap-2">
+            <span class="badge {{ 'bg-success' if sentiment_label == '好评' else ('bg-danger' if sentiment_label == '差评' else ('bg-warning' if sentiment_label in ('样本不足', '暂无评价') else 'bg-secondary')) }}">
+              {{ sentiment_label }}
+            </span>
+            <span class="meta">RI {{ "%.1f"|format(stat.get('score', 0)) }}</span>
+          </div>
+          <div class="sentiment-stack sentiment-stack-sm">
+            <span class="positive" style="width: {{ '%.1f'|format(stat.get('positive_rate', 0) * 100) }}%"></span>
+            <span class="neutral" style="width: {{ '%.1f'|format(stat.get('neutral_rate', 0) * 100) }}%"></span>
+            <span class="negative" style="width: {{ '%.1f'|format(stat.get('negative_rate', 0) * 100) }}%"></span>
+          </div>
+          <div class="meta product-card-rates">
+            {% if stat.get('count') %}
+              好评率 {{ "%.1f"|format(stat.get('positive_rate', 0) * 100) }}% · 差评 {{ "%.1f"|format(stat.get('negative_rate', 0) * 100) }}%
+            {% else %}
+              暂无情感数据
+            {% endif %}
+          </div>
+        </div>
+        <div class="product-footer">
+          <div>
+            <span class="product-price">¥{{ "%.0f"|format(product.price) }}</span>
+            <del class="product-original">¥{{ "%.0f"|format(product.original_price) }}</del>
+          </div>
+          <div class="product-rating">
+            {% if stat.get('count') %}
+              ★ {{ "%.1f"|format(stat.get('rating', 0)) }} · {{ stat.get('count') }} 条
+            {% else %}
+              暂无评论
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </a>
+  {% else %}
+    <div class="card card-body empty">没有找到匹配的商品。 <a href="{{ url_for('product.index') }}">查看全部商品</a></div>
+  {% endfor %}
+</div>
+
+<p class="text-muted small mt-3">目录共 {{ products|length }} 件商品；评论数据来自用户提交，展示前经过审核。</p>
+{% endblock %}

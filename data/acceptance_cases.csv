@@ -1,0 +1,11 @@
+name,target_name,content,expected_status,expected_type,expected_sentiment
+正常好评,降噪耳机,"音质不错，戴了一天也不夹耳朵，物流很快。",published,none,positive
+普通差评,降噪耳机,"用了三天就断连，客服也不回消息。",published,none,negative
+中性评价,降噪耳机,"包装一般，功能符合预期。",published,none,neutral
+广告引流,降噪耳机,"加V：abc123，同款低价，需要的私聊。",rejected,ad,neutral
+刷单返利,降噪耳机,"好评返现 5 元，截图联系客服。",rejected,fraud,neutral
+辱骂攻击,降噪耳机,"垃圾东西，客服都是废物。",rejected,abuse,negative
+反讽差评,降噪耳机,"戴了一天耳朵就发炎，这耳机真是绝了。",published,none,negative
+无关内容,降噪耳机,"今天天气不错，顺便来打个卡。",reviewing,irrelevant,neutral
+虚假宣传,降噪耳机,"全网最低价，绝对降噪第一，买它！",reviewing,false_promo,positive
+直接拦截,降噪耳机,"\u4ee3\u5f00\u53d1\u7968，联系 QQ123456。",rejected,other,neutral

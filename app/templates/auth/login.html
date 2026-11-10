@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}登录 · {{ app_name }}{% endblock %}
+{% block content %}
+<div class="row">
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-body">
+        <h2>登录</h2>
+        <p class="text-muted">普通用户、审核员、管理员共用入口。</p>
+        <form method="post">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="next" value="{{ next_url or '' }}">
+          <div class="mb-3">
+            <label class="form-label" for="username">用户名</label>
+            <input class="form-control" id="username" name="username" value="{{ username or '' }}" required autofocus>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="password">密码</label>
+            <input class="form-control" id="password" name="password" type="password" required>
+          </div>
+          <button class="btn btn-primary w-100" type="submit">登录</button>
+        </form>
+        <p class="mt-3 mb-0 text-muted small">还没有账号？<a href="{{ url_for('auth.register') }}">注册普通用户</a></p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-body">
+        <h3>演示账号</h3>
+        <table class="table table-sm">
+          <thead><tr><th>角色</th><th>用户名</th><th>密码</th></tr></thead>
+          <tbody>
+            <tr><td>管理员</td><td><code>admin</code></td><td><code>admin123</code></td></tr>
+            <tr><td>审核员</td><td><code>reviewer</code></td><td><code>reviewer123</code></td></tr>
+            <tr><td>普通用户</td><td><code>user</code></td><td><code>user123</code></td></tr>
+          </tbody>
+        </table>
+        <p class="text-muted small mb-0">仅用于答辩演示，上线前必须改强密码。</p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

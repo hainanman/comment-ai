@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% from "_pagination.html" import render_pagination with context %}
+{% block title %}评论广场 · {{ app_name }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+  <div>
+    <h1 class="mb-1">评论广场</h1>
+    <p class="text-muted mb-0">只展示审核通过的评论。</p>
+  </div>
+  {% if current_user and current_user.role == 'user' %}
+    <a class="btn btn-primary" href="{{ url_for('product.index') }}">去商品列表写评论</a>
+  {% endif %}
+</div>
+
+<form class="card card-body mb-3" method="get">
+  <div class="row">
+    <div class="col-md-6 mb-2">
+      <label class="form-label" for="q">搜索</label>
+      <input class="form-control" id="q" name="q" value="{{ q }}" placeholder="商品/内容名称或评论关键词">
+    </div>
+    <div class="col-md-3 mb-2">
+      <label class="form-label" for="sentiment">情感</label>
+      <select class="form-select" id="sentiment" name="sentiment">
+        <option value="">全部</option>
+        <option value="positive" {{ 'selected' if sentiment == 'positive' else '' }}>好评</option>
+        <option value="neutral" {{ 'selected' if sentiment == 'neutral' else '' }}>中评</option>
+        <option value="negative" {{ 'selected' if sentiment == 'negative' else '' }}>差评</option>
+      </select>
+    </div>
+    <div class="col-md-3 mb-2 d-flex align-items-end gap-2">
+      <button class="btn btn-primary" type="submit">筛选</button>
+      <a class="btn btn-outline-secondary" href="{{ url_for('comment.index') }}">重置</a>
+    </div>
+  </div>
+</form>
+
+{% for comment in pagination.items %}
+  <article class="card mb-3">
+    <div class="card-body">
+      <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+        <div>
+          {% if comment.product_slug %}
+            <a class="fw-bold text-decoration-none" href="{{ url_for('product.detail', slug=comment.product_slug) }}">{{ comment.target_name }}</a>
+          {% else %}
+            <strong>{{ comment.target_name }}</strong>
+          {% endif %}
+          <span class="badge {{ 'bg-success' if comment.sentiment == 'positive' else ('bg-danger' if comment.sentiment == 'negative' else 'bg-secondary') }}">
+            {{ comment.sentiment_label }}
+          </span>
+        </div>
+        <span class="meta">{{ comment.created_at|dt }}</span>
+      </div>
+      <p class="comment-content mt-2 mb-2">{{ comment.content }}</p>
+      <div class="mb-1">
+        {% for word in comment.keywords or [] %}
+          <span class="keyword">{{ word }}</span>
+        {% endfor %}
+      </div>
+      <div class="meta">评分 {{ comment.rating }}/5 · {{ comment.user.username if comment.user else '匿名用户' }}</div>
+    </div>
+  </article>
+{% else %}
+  <div class="card card-body empty">暂无已发布评论。{% if current_user and current_user.role == 'user' %}<a href="{{ url_for('product.index') }}">去商品列表写第一条</a>{% endif %}</div>
+{% endfor %}
+
+{{ render_pagination(pagination) }}
+{% endblock %}

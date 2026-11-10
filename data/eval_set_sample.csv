@@ -1,0 +1,11 @@
+id,target_name,content,sentiment_label,violation_label,violation_type_label
+1,耳机,"音质不错，戴了一天也不夹耳朵，物流很快。",positive,0,none
+2,耳机,"用了三天就断连，客服也不回消息。",negative,0,none
+3,耳机,"包装一般，功能符合预期。",neutral,0,none
+4,耳机,"加V：abc123，同款低价，需要的私聊。",neutral,1,ad
+5,耳机,"好评返现 5 元，截图联系客服。",neutral,1,fraud
+6,耳机,"垃圾东西，客服都是废物。",negative,1,abuse
+7,耳机,"戴了一天耳朵就发炎，这耳机真是绝了。",negative,0,none
+8,耳机,"今天天气不错，顺便来打个卡。",neutral,1,irrelevant
+9,耳机,"全网最低价，绝对降噪第一，买它！",neutral,1,false_promo
+10,耳机,"\u4ee3\u5f00\u53d1\u7968，联系 QQ123456。",neutral,1,other

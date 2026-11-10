@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}评论结果 · {{ app_name }}{% endblock %}
+{% block content %}
+{% set badge = 'bg-success' if comment.status == 'published' else ('bg-warning' if comment.status == 'reviewing' else ('bg-danger' if comment.status == 'rejected' else 'bg-secondary')) %}
+<div class="row">
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+          <h1 class="mb-1">评论提交结果</h1>
+          <span class="badge {{ badge }}">{{ comment.status_label }}</span>
+        </div>
+        <p class="text-muted">{{ comment.user_message }}</p>
+
+        <div class="border rounded p-3 bg-light mb-3">
+          <div class="d-flex justify-content-between flex-wrap gap-2">
+            {% if comment.product_slug %}
+              <a class="fw-bold text-decoration-none" href="{{ url_for('product.detail', slug=comment.product_slug) }}">{{ comment.target_name }}</a>
+            {% else %}
+              <strong>{{ comment.target_name }}</strong>
+            {% endif %}
+            <span class="meta">评分 {{ comment.rating }}/5</span>
+          </div>
+          <p class="comment-content mt-2 mb-2">{{ comment.content }}</p>
+          <div class="meta">提交时间：{{ comment.created_at|dt }}</div>
+        </div>
+
+        {% if comment.status != 'pending' %}
+          <table class="table table-sm">
+            <tbody>
+              <tr><th>情感</th><td>{{ comment.sentiment_label }}（置信度 {{ comment.sentiment_confidence|pct }}）</td></tr>
+              <tr><th>违规类型</th><td>{{ comment.violation_label }}</td></tr>
+              <tr><th>关键词</th>
+                <td>
+                  {% for word in comment.keywords or [] %}
+                    <span class="keyword">{{ word }}</span>
+                  {% endfor %}
+                </td>
+              </tr>
+              <tr><th>分析方式</th><td>{{ comment.engine_label }}</td></tr>
+            </tbody>
+          </table>
+        {% endif %}
+
+        <div class="d-flex flex-wrap gap-2">
+          {% if comment.product_slug %}
+            <a class="btn btn-primary" href="{{ url_for('product.detail', slug=comment.product_slug) }}">返回商品</a>
+          {% endif %}
+          <a class="btn btn-outline-secondary" href="{{ url_for('comment.my_comments') }}">返回我的评论</a>
+          {% if comment.is_appealable %}
+            <form method="post" action="{{ url_for('comment.appeal', comment_id=comment.id) }}"
+                  onsubmit="return confirm('确定对该评论发起申诉吗？每条评论只能申诉一次。');">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button class="btn btn-warning" type="submit">申诉</button>
+            </form>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

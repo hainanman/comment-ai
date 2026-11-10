@@ -72,8 +72,10 @@ def create_app(config_object=Config, **overrides) -> Flask:
 
     @app.get("/")
     def root():
-        """首页直接进商品列表，评论广场在 /comments。"""
-        return redirect(url_for("product.index"))
+        """首页直接展示商品列表（返回 200，避免 302 影响云平台健康检查）。"""
+        from .product.routes import index as product_index
+
+        return product_index()
 
     @app.before_request
     def load_user():

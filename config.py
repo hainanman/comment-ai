@@ -39,7 +39,7 @@ def env_float(name: str, default: float) -> float:
 
 _DB_URI = os.getenv(
     "DATABASE_URL",
-    "mysql+pymysql://comment_ai:change-me@127.0.0.1:3306/comment_ai?charset=utf8mb4",
+    "sqlite:///comment_ai.db",
 )
 
 _ENGINE_OPTIONS = {}

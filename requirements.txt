@@ -1,6 +1,6 @@
 Flask>=3.0,<4.0
 Flask-SQLAlchemy>=3.1,<4.0
-PyMySQL>=1.1,<2.0
+# 本地 MySQL 开发：额外安装对应数据库驱动（见 README）
 cryptography>=42.0
 jieba>=0.42
 requests>=2.32

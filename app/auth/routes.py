@@ -69,7 +69,7 @@ def login():
         session["user_id"] = user.id
         session.permanent = True
         flash(f"欢迎回来，{user.username}。", "success")
-        return redirect(next_url or url_for("comment.index"))
+        return redirect(next_url or url_for("product.index"))
 
     return render_template("auth/login.html", next_url=next_url)
 
@@ -78,4 +78,4 @@ def login():
 def logout():
     session.clear()
     flash("已退出登录。", "info")
-    return redirect(url_for("comment.index"))
+    return redirect(url_for("product.index"))

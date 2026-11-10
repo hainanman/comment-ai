@@ -8,7 +8,7 @@ from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
 import click
-from flask import Flask, g, jsonify, render_template, request, session, url_for
+from flask import Flask, g, jsonify, redirect, render_template, request, session, url_for
 from sqlalchemy import text
 
 from config import Config
@@ -69,6 +69,11 @@ def create_app(config_object=Config, **overrides) -> Flask:
     app.register_blueprint(review_bp)
     app.register_blueprint(admin_bp)
     app.register_blueprint(stats_bp)
+
+    @app.get("/")
+    def root():
+        """首页直接进商品列表，评论广场在 /comments。"""
+        return redirect(url_for("product.index"))
 
     @app.before_request
     def load_user():

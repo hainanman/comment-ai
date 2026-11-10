@@ -26,7 +26,7 @@ comment_bp = Blueprint("comment", __name__)
 SENTIMENT_VALUES = {"positive", "neutral", "negative"}
 
 
-@comment_bp.get("/")
+@comment_bp.get("/comments")
 def index():
     q = (request.args.get("q") or "").strip()
     sentiment = (request.args.get("sentiment") or "").strip()

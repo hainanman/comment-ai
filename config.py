@@ -71,7 +71,7 @@ class Config:
         "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
     )
     DASHSCOPE_API_KEY = os.getenv("DASHSCOPE_API_KEY", "")
-    LLM_TIMEOUT = env_float("LLM_TIMEOUT", 4.0)
+    LLM_TIMEOUT = env_float("LLM_TIMEOUT", 25.0)
     LLM_JSON_MODE = env_bool("LLM_JSON_MODE", True)
     REVIEW_THRESHOLD = env_float("REVIEW_THRESHOLD", 0.50)
     REJECT_THRESHOLD = env_float("REJECT_THRESHOLD", 0.85)

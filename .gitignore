@@ -12,3 +12,6 @@ backup/*.sql
 comment_ai.db
 *.sqlite
 .DS_Store
+
+.wbapp_*.genie
+.workbuddy/

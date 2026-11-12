@@ -3,12 +3,23 @@ from __future__ import annotations
 
 import json
 import logging
+import time
 from datetime import timedelta
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
 import click
-from flask import Flask, g, jsonify, redirect, render_template, request, session, url_for
+from flask import (
+    Flask,
+    abort,
+    g,
+    jsonify,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+)
 from sqlalchemy import text
 
 from config import Config
@@ -131,6 +142,45 @@ def create_app(config_object=Config, **overrides) -> Flask:
             db=True,
             ai_enabled=bool(app.config["AI_ENABLED"]),
         )
+
+    @app.get("/healthz/ai")
+    def healthz_ai():
+        """真实调用一次 qwen-plus，用于线上自检（结果缓存 120 秒）。"""
+        if request.args.get("k") != "demo2026":
+            abort(404)
+        now = time.time()
+        cached = app.extensions.get("ai_probe")
+        if cached and now - cached[0] < 120:
+            return jsonify(**cached[1], cached=True)
+
+        from .ai.llm import LLMError, call_llm, parse_llm_output
+        from .ai.rules import scan_rules
+
+        probe_text = "质量真好，用一天就坏，客服还爱搭不理。"
+        started = time.time()
+        payload = {"ok": False}
+        try:
+            rule_hits = scan_rules(probe_text).hits
+            raw, elapsed = call_llm(probe_text, "降噪耳机", rule_hits)
+            parsed = parse_llm_output(raw)
+            payload = {
+                "ok": True,
+                "model": app.config["AI_MODEL"],
+                "latency_ms": elapsed,
+                "result": parsed,
+                "raw_head": raw[:200],
+            }
+        except LLMError as exc:
+            payload = {
+                "ok": False,
+                "model": app.config.get("AI_MODEL"),
+                "error": str(exc),
+                "elapsed_ms": int((time.time() - started) * 1000),
+            }
+        except Exception as exc:  # noqa: BLE001
+            payload = {"ok": False, "error": f"{type(exc).__name__}: {exc}"}
+        app.extensions["ai_probe"] = (now, payload)
+        return jsonify(**payload)
 
     @app.errorhandler(403)
     def forbidden(error):

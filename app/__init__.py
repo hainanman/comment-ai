@@ -88,6 +88,18 @@ def create_app(config_object=Config, **overrides) -> Flask:
 
         return product_index()
 
+    @app.url_defaults
+    def keep_sharecode(endpoint, values):
+        """把当前请求的 sharecode 透传到所有 url_for 生成的链接上。
+
+        部分分享式预览平台（例如 workbuddy 分享域名）会在网关层对**每个** URL
+        校验 sharecode，连静态资源也不例外，一旦站内跳转丢掉参数就返回 403。
+        这里统一补上，用户只需从带参数的入口打开一次即可全站通行。
+        """
+        code = request.args.get("sharecode")
+        if code and "sharecode" not in values:
+            values["sharecode"] = code
+
     @app.before_request
     def load_user():
         g.user = None
